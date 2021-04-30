@@ -116,6 +116,9 @@ async function initConnector(config, node, allowedCallers) {
     // Handle incoming message
     bot.onMessage(async (context, next) => {
       const text = context.activity.text;
+      if (context.activity.name === 'webchat/join') {
+        await await context.sendActivity("Salut");
+      }
 
       if (ifRootBot) {
         const activeSkill = bot.skillsConfig.skills[text];
@@ -282,11 +285,11 @@ async function reply(node, data, globalTypingDelay) {
 
 async function sendWelcomeMessage(node, context, resolve, reject, next) {
   let data = buildMessageFlow(context.activity);
-  data.message = {};
 
   let ref = TurnContext.getConversationReference(context.activity);
   let _context = botmgr.getContext(data);
   _context.convRef = ref;
+  _context.lastMessageDate = data.message.timestamp;
   _context.next = next;
 
   resolve();

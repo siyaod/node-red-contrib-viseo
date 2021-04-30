@@ -15,22 +15,23 @@ class VBMBot extends ActivityHandler {
     }
 
     this.botId = appId;
-
-    if (welcomeMessage) {
       this.onMembersAdded(async (context, next) => {
         const membersAdded = context.activity.membersAdded;
+
         for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].id === context.activity.recipient.id) {
+          if (membersAdded[cnt].id !== context.activity.recipient.id) {
             return await new Promise(function (resolve, reject) {
               context.activity.type = "message";
-              context.activity.value = welcomeMessage;
+              context.activity.text = welcomeMessage;
               sendWelcomeMessage(node, context, resolve, reject, next);
             });
-          }
-        }
+         }
+       }
         await next();
       });
-    }
+      this.MessageReaction(async(context,next)=>{
+        const MessageReaction = context.activity.reactionsAdded;
+      });
   }
 
   // Override the ActivityHandler.run() method to save state changes
@@ -54,6 +55,7 @@ class VBMBot extends ActivityHandler {
       throw new Error(`[Botbuilder]: cannot invoke skill with appId: "${targetSkill.appId}" \r\nat "${targetSkill.skillEndpoint}" \r\n(status is ${response.status}). \r\n ${response.body}`);
     }
   }
+
 }
 
 module.exports.VBMBot = VBMBot;
