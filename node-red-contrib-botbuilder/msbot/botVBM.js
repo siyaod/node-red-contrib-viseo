@@ -29,9 +29,7 @@ class VBMBot extends ActivityHandler {
        }
         await next();
       });
-      this.MessageReaction(async(context,next)=>{
-        const MessageReaction = context.activity.reactionsAdded;
-      });
+      
   }
 
   // Override the ActivityHandler.run() method to save state changes
