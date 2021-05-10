@@ -116,9 +116,6 @@ async function initConnector(config, node, allowedCallers) {
     // Handle incoming message
     bot.onMessage(async (context, next) => {
       const text = context.activity.text;
-      if (context.activity.name === 'webchat/join') {
-        await await context.sendActivity("Salut");
-      }
 
       if (ifRootBot) {
         const activeSkill = bot.skillsConfig.skills[text];
@@ -127,7 +124,7 @@ async function initConnector(config, node, allowedCallers) {
           await next();
         }
       }
-      
+
       await new Promise(function(resolve, reject) {
         receive(node, config, context, bot);
         resolve();

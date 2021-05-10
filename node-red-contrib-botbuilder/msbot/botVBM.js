@@ -1,8 +1,14 @@
-const { ActivityHandler } = require("botbuilder");
+const { ActivityHandler, MessageFactory } = require("botbuilder");
 
 class VBMBot extends ActivityHandler {
   constructor(node, appId, welcomeMessage, sendWelcomeMessage, conversationState, skillsConfig, skillClient) {
     super();
+
+    if(node){
+      this.node = node;    }
+    if(sendWelcomeMessage){
+    this.sendWelcomeMessage = sendWelcomeMessage;
+    }
 
     if (conversationState) {
       this.conversationState = conversationState;
@@ -29,8 +35,17 @@ class VBMBot extends ActivityHandler {
        }
         await next();
       });
-      
   }
+  
+
+  async onReactionsAddedActivity(reactionsAdded, context) {
+    for (var i = 0, len = reactionsAdded.length; i < len; i++) {
+        context.activity.type = "message";
+        context.activity.text = reactionsAdded[i].helpful;
+        const replyActivity = MessageFactory.text( ` added '${ reactionsAdded[i].type }' regarding '${ context.activity.text }'`);
+        const resourceResponse = await context.sendActivity(replyActivity);
+     }
+    };
 
   // Override the ActivityHandler.run() method to save state changes
   async run(context) {
