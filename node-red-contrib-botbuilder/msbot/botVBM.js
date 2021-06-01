@@ -1,13 +1,19 @@
 const { ActivityHandler, MessageFactory } = require("botbuilder");
 
 class VBMBot extends ActivityHandler {
-  constructor(node, appId, welcomeMessage, sendWelcomeMessage, conversationState, skillsConfig, skillClient) {
+  constructor(node, appId, welcomeMessage, sendWelcomeMessage, sendReactionMessage, conversationState, skillsConfig, skillClient) {
     super();
 
-    if(node){
-      this.node = node;    }
+    if (node) {
+      this.node = node;
+    }
+
+    if(sendReactionMessage){
+      this.sendReactionMessage = sendReactionMessage;
+    }
+    
     if(sendWelcomeMessage){
-    this.sendWelcomeMessage = sendWelcomeMessage;
+      this.sendWelcomeMessage = sendWelcomeMessage;
     }
 
     if (conversationState) {
@@ -25,10 +31,10 @@ class VBMBot extends ActivityHandler {
         const membersAdded = context.activity.membersAdded;
 
         for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].id !== context.activity.recipient.id) {
+          if (membersAdded[cnt].name === "") {
             return await new Promise(function (resolve, reject) {
               context.activity.type = "message";
-              context.activity.text = welcomeMessage;
+              context.activity.text = "Cmd-Start";
               sendWelcomeMessage(node, context, resolve, reject, next);
             });
          }
@@ -40,10 +46,9 @@ class VBMBot extends ActivityHandler {
 
   async onReactionsAddedActivity(reactionsAdded, context) {
     for (var i = 0, len = reactionsAdded.length; i < len; i++) {
-        context.activity.type = "message";
-        context.activity.text = reactionsAdded[i].helpful;
-        const replyActivity = MessageFactory.text( ` added '${ reactionsAdded[i].type }' regarding '${ context.activity.text }'`);
-        const resourceResponse = await context.sendActivity(replyActivity);
+      
+      context.activity.type = "messageReaction";
+      this.sendReactionMessage(this.node,context);
      }
     };
 

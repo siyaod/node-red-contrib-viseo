@@ -54,7 +54,7 @@ function createBot(adapter, config, node, allowedCallers, ifRootBot, authConfig)
       const skillsConfig = new SkillsConfiguration(allowedCallers, `${global.CONFIG.server.host}/api/skills`);
       const credentialProvider = new SimpleCredentialProvider(config.appId, config.appPassword);
       const skillClient = new SkillHttpClient(credentialProvider, conversationIdFactory);
-      bot = new VBMBot(node, config.appId, config.startCmd, sendWelcomeMessage, conversationState, skillsConfig, skillClient);
+      bot = new VBMBot(node, config.appId, config.startCmd, sendWelcomeMessage,sendReactionMessage, conversationState, skillsConfig, skillClient);
 
       // Init skill endpoint associated
       skillHandler = new SkillHandler(adapter, bot, conversationIdFactory, credentialProvider, authConfig);
@@ -62,7 +62,7 @@ function createBot(adapter, config, node, allowedCallers, ifRootBot, authConfig)
 
     } else {
       // create a skill
-      bot = new VBMBot(node, config.appId, config.startCmd, null, conversationState);
+      bot = new VBMBot(node, config.appId, config.startCmd, null, sendReactionMessage, conversationState);
     }
   }
   return bot;
@@ -290,5 +290,16 @@ async function sendWelcomeMessage(node, context, resolve, reject, next) {
   _context.next = next;
 
   resolve();
-  node.send([data, null]);
+  node.send([null, data]);
+}
+
+async function sendReactionMessage(node, context){
+  let data = buildMessageFlow(context.activity);
+
+  let ref = TurnContext.getConversationReference(context.activity);
+  let _context = botmgr.getContext(data);
+  _context.convRef = ref;
+  _context.lastMessageDate = data.message.timestamp;
+  // let data = context.activity;
+  node.send([null, data]);
 }
