@@ -1,20 +1,18 @@
-const { ActivityHandler, MessageFactory } = require("botbuilder");
+const { ActivityHandler } = require('botbuilder');
 
 class VBMBot extends ActivityHandler {
-  constructor(node, appId, welcomeMessage, sendWelcomeMessage, sendReactionMessage, conversationState, skillsConfig, skillClient) {
+  constructor(node, appId, welcomeMessage, sendWelcomeMessage, conversationState, skillsConfig, skillClient) {
     super();
 
-    if (node) {
-      this.node = node;
+    if (!node) {
+      throw new Error('[BotBuilder] Property node missing in the VBMBOT');
     }
 
-    if(sendReactionMessage){
-      this.sendReactionMessage = sendReactionMessage;
+    if (!appId) {
+      throw new Error('[BotBuilder] Property appId missing in the VBMBOT');
     }
-    
-    if(sendWelcomeMessage){
-      this.sendWelcomeMessage = sendWelcomeMessage;
-    }
+
+    this.botId = appId;
 
     if (conversationState) {
       this.conversationState = conversationState;
@@ -26,31 +24,35 @@ class VBMBot extends ActivityHandler {
       this.skillClient = skillClient;
     }
 
-    this.botId = appId;
-      this.onMembersAdded(async (context, next) => {
-        const membersAdded = context.activity.membersAdded;
+    // Sends welcome messages to conversation members when they join the conversation.
+    this.onMembersAdded(async (context, next) => {
+      const membersAdded = context.activity.membersAdded;
 
-        for (let cnt = 0; cnt < membersAdded.length; cnt++) {
-          if (membersAdded[cnt].name === "") {
-            return await new Promise(function (resolve, reject) {
-              context.activity.type = "message";
-              context.activity.text = "Cmd-Start";
-              sendWelcomeMessage(node, context, resolve, reject, next);
-            });
-         }
-       }
-        await next();
-      });
+      for (let cnt = 0; cnt < membersAdded.length; cnt++) {
+          // Greet anyone that was not the target (recipient) of this message.
+          // Since the bot is the recipient for events from the channel,
+          // context.activity.membersAdded === context.activity.recipient.Id indicates the
+          // bot was added to the conversation, and the opposite indicates this is a user.
+          if (membersAdded[cnt].id !== context.activity.recipient.id) {
+          return await new Promise(function (resolve, reject) {
+            context.activity.type = 'message';
+            context.activity.text = welcomeMessage;
+            sendWelcomeMessage(node, context, resolve, reject, next);
+          });
+        }
+      }
+      await next();
+    });
   }
-  
 
   async onReactionsAddedActivity(reactionsAdded, context) {
     for (var i = 0, len = reactionsAdded.length; i < len; i++) {
-      
-      context.activity.type = "messageReaction";
-      this.sendReactionMessage(this.node,context);
+      return await new Promise(function (resolve, reject) {
+        context.activity.type = "messageReaction";
+        sendWelcomeMessage(node, context, resolve, reject);
+      });
      }
-    };
+  };
 
   // Override the ActivityHandler.run() method to save state changes
   async run(context) {
@@ -58,7 +60,7 @@ class VBMBot extends ActivityHandler {
     if (this.conversationState) await this.conversationState.saveChanges(context, false);
   }
 
-  // route the activity to the skill
+  // Route the activity to the skill
   async sendToSkill(activity, targetSkill) {
     if (typeof activity === 'undefined') {
       throw new Error(`[Botbuilder]: cannot find activity to send to skill`);
