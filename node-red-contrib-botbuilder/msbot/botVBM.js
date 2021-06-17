@@ -29,11 +29,11 @@ class VBMBot extends ActivityHandler {
       const membersAdded = context.activity.membersAdded;
 
       for (let member of membersAdded) {
-          // Greet anyone that was not the target (recipient) of this message.
-          // Since the bot is the recipient for events from the channel,
-          // context.activity.membersAdded === context.activity.recipient.Id indicates the
-          // bot was added to the conversation, and the opposite indicates this is a user.
-          if (member.id !== context.activity.recipient.id) {
+        // Greet anyone that was not the target (recipient) of this message.
+        // Since the bot is the recipient for events from the channel,
+        // context.activity.membersAdded === context.activity.recipient.Id indicates the
+        // bot was added to the conversation, and the opposite indicates this is a user.
+        if (member.id !== context.activity.recipient.id) {
           return await new Promise(function (resolve, reject) {
             context.activity.type = 'message';
             context.activity.text = welcomeMessage;

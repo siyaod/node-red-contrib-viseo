@@ -158,7 +158,7 @@ function buildMessageFlow(activity) {
   if (!message.serviceUrl) return;
 
   message.user = message.from;
-  message.address = { 
+  message.address = {
     conversation: message.conversation,
     id: message.id,
     serviceUrl: message.serviceUrl,
@@ -175,7 +175,7 @@ function buildMessageFlow(activity) {
   let data = botmgr.buildMessageFlow(
     {
       message: JSON.parse(JSON.stringify(message)),
-      payload: message.text,
+      payload: message.text ? message.text : message.value.value, // message from bot-send-card of type adaptiveCard
       user: message.from
     },
     { agent: "botbuilder" }

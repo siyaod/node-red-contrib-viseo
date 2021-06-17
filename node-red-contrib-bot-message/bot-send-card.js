@@ -417,15 +417,18 @@ const addButtonToAdaptiveCard = (textButtonMarker, prefix, textToShow, body) => 
         "type": "TextBlock",
         "wrap": true,
         "size": "default",
-        "text": textToShow						
+        "text": textToShow
     };
     let button;
     const btnVal = textToShow.substring(textButtonMarker.length).trim(); // remove text marker ('- ') ahead of string
     if (btnVal && btnVal !== '') {
         button = {
-            "type": "Action.Submit",
-            "title": "cool link",
-            "data":{"__isBotFrameworkCardAction": true, "type": "postBack", "value": `${prefix + btnVal}`}
+            type: "Action.Submit",
+            title: `${btnVal.split('. ')[1]}`,
+            data: {
+                type: "postBack",
+                value: `${prefix + btnVal}`
+            }
         };
         body.push({
             "type": "Container",
@@ -584,7 +587,7 @@ const buildReplyAdaptiveCard = (RED, node, locale, data, config, reply) => {
 
     reply.type = 'AdaptiveCard';
     reply.title = title;
-    reply.version = "1.0";
+    reply.version = "1.3";
     reply.body = [];
 
     /*customized text to display*/
