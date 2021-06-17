@@ -421,20 +421,6 @@ const getAdaptiveCard = opts => {
   // Attach Subtitle, appears just below Title field, differs from Title in font styling only.
   if (!!opts.subtitle) spch += opts.subtitle;
 
-  let buttons = opts.buttons;
-  if (undefined !== buttons) {
-    var btns = [];
-    for (let button of buttons) {
-      if ("string" === typeof button) {
-        btns.push({ type: "postBack", title: button, value: button });
-      } else if (!button.value) {
-        continue;
-      } else {
-        btns.push(getCardAction(button));
-      }
-    }
-  }
-
   let card = {
     $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
     type: "AdaptiveCard",
@@ -443,7 +429,7 @@ const getAdaptiveCard = opts => {
     subtext: opts.subtext,
     subtitle: opts.subtitle,
     body: opts.body,
-    actions: btns,
+    actions: opts.actions,
     speak: spch
   };
 
