@@ -175,9 +175,7 @@ function buildMessageFlow(activity) {
   let data = botmgr.buildMessageFlow(
     {
       message: JSON.parse(JSON.stringify(message)),
-      payload: message.text ? message.text : message.value, // message from bot-send-card of type adaptiveCard
-      user: message.from
-    },
+      payload: message.text ? message.text : (typeof message.value.value === 'undefined' ? message.value : message.value.value),    },
     { agent: "botbuilder" }
   );
 
