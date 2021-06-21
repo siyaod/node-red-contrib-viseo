@@ -13,7 +13,12 @@ class VBMBot extends ActivityHandler {
     }
 
     this.botId = appId;
-
+    if (sendWelcomeMessage) {
+      this.sendWelcomeMessage = sendWelcomeMessage;
+    }
+    if (node) {
+      this.node = node;
+    }
     if (conversationState) {
       this.conversationState = conversationState;
     }
@@ -34,11 +39,9 @@ class VBMBot extends ActivityHandler {
         // context.activity.membersAdded === context.activity.recipient.Id indicates the
         // bot was added to the conversation, and the opposite indicates this is a user.
         if (member.id !== context.activity.recipient.id) {
-          return await new Promise(function (resolve, reject) {
             context.activity.type = 'message';
             context.activity.text = welcomeMessage;
-            sendWelcomeMessage(node, context, resolve, reject, next);
-          });
+            sendWelcomeMessage(node, context);
         }
       }
       await next();
@@ -47,10 +50,8 @@ class VBMBot extends ActivityHandler {
 
   async onReactionsAddedActivity(reactionsAdded, context) {
     for (var i = 0, len = reactionsAdded.length; i < len; i++) {
-      return await new Promise(function (resolve, reject) {
         context.activity.type = "messageReaction";
-        sendWelcomeMessage(node, context, resolve, reject);
-      });
+        this.sendWelcomeMessage(this.node, context);
      }
   };
 

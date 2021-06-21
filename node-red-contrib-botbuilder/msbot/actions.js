@@ -175,7 +175,7 @@ function buildMessageFlow(activity) {
   let data = botmgr.buildMessageFlow(
     {
       message: JSON.parse(JSON.stringify(message)),
-      payload: message.text ? message.text : message.value.value, // message from bot-send-card of type adaptiveCard
+      payload: message.text ? message.text : message.value, // message from bot-send-card of type adaptiveCard
       user: message.from
     },
     { agent: "botbuilder" }
@@ -281,15 +281,15 @@ async function reply(node, data, globalTypingDelay) {
   return callback();
 }
 
-async function sendWelcomeMessage(node, context, resolve, reject, next) {
+async function sendWelcomeMessage(node, context) {
   let data = buildMessageFlow(context.activity);
 
   let ref = TurnContext.getConversationReference(context.activity);
   let _context = botmgr.getContext(data);
   _context.convRef = ref;
   _context.lastMessageDate = data.message.timestamp;
-  _context.next = next;
+  // // _context.next = next;
 
-  resolve();
+  // // resolve();
   node.send([null, data]);
 }
